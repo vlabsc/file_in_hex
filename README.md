@@ -12,7 +12,9 @@ its a simple and fast hex viewer for any file.
 Yet to do:
 
 file input through arguments
+
 more error checking
+
 more larger file handling
 
 ![image](https://github.com/vlabsc/file_in_hex/assets/5446466/5e69afdc-b6bb-42dc-95c5-76c67727caf7)
