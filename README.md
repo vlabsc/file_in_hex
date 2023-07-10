@@ -1,5 +1,5 @@
 # file_in_hex
-print the content of file in hex format - written in FASM
+file_in_hex (v8) - print the content of file in hex format - written in FASM
 
 file_in_hex - parses any file and prints the content in hex and ASCII format - simple - written in FASM (https://flatassembler.net/)
 
