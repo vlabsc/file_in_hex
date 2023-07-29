@@ -1,16 +1,16 @@
 ; fih.asm
-; file in hex version 10
-; version 10 - argument from command line for file - completed
+; file in hex version 11
+; version 11 - speed test with powershell
 ; file size limit check - completed
 ; yet to do - error handling
 
 format PE64 console
 entry main
 
-include 'WIN64AX.INC'
+include 'C:\fasm\INCLUDE\WIN64AX.INC'
 
-include 'libs.inc'
-include 'macros.inc'
+include 'V:\OneHalf\Programming\asm\FASM\libs\libs.inc'
+include 'V:\OneHalf\Programming\asm\FASM\libs\macros.inc'
 
 
 section '.data' data readable writeable
