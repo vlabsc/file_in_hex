@@ -8,7 +8,8 @@ section '.data' data readable writeable
 hextable db '0123456789ABCDEF'
 hexstring rb 48
 db 0    ; end of string 
-
+filterstring rb 16
+db 0 
 
 section '.text' code readable executable
 
@@ -105,7 +106,8 @@ proc print_hex hexprint_buffer_total_lines_to_display, \
         ; esi holds the original offset, edi is incremented for every cell display
         xor ecx, ecx
         xor edi, edi
-        mov edi, esi    ; restore
+        ;mov edi, esi    ; restore
+        lea edi, [filterstring]
         xor r15d, r15d
 
         invoke printf, "[ "
@@ -113,24 +115,36 @@ proc print_hex hexprint_buffer_total_lines_to_display, \
             cmp r15b, byte [hexprint_buffer_total_columns_to_display]
             je .iteration_loop_cols_ascii_end
             
-            ;mov ecx, edi
-            ;add ecx, dword [inputfile_read_buffer_address]
-            mov ecx, edi
-            mov ecx, [ecx]
-            fastcall print_ascii_character, ecx
-
+            ;mov ecx, esi
+            ;mov ecx, [ecx]
+            mov ecx, [esi]
+            cmp byte cl, 0x20
+            jge .check_ascii_readable_1
+            jmp .ascii_not_normal_print
+            .check_ascii_readable_1:
+                cmp byte cl, 0x7e
+                jle .ascii_normal_print
+                jmp .ascii_not_normal_print
+            .ascii_normal_print:
+                ;invoke printf, "%c", [char_to_print]
+                mov [edi], byte cl
+                jmp .check_ascii_readable_1_out
+            .ascii_not_normal_print:
+                mov [edi], byte 0x2e
+                ;invoke printf, "."
+            .check_ascii_readable_1_out:
             inc edi
-            ;inc esi
+            inc esi
             inc r15b
             jmp .iteration_loop_cols_ascii_start
         .iteration_loop_cols_ascii_end:
-        invoke printf, " ] "
+        invoke printf, "%s ] ", addr filterstring
         ; print the ASCII of the row - end
 
         ;l at this point one row is over. hence calculation are made
 
         inc r14d            ; one row is over
-        mov esi, edi
+        ;mov esi, edi
 
         mov dword ecx, dword [hexprint_buffer_total_columns_to_display]
         add dword [row_address_print], dword ecx    
@@ -139,6 +153,8 @@ proc print_hex hexprint_buffer_total_lines_to_display, \
         jmp iteration_loop_each_rows_start
     iteration_loop_each_rows_end:
 
+
+; -----------------------------------------------------------------------------------
     ; now let's iterate the last row
 
     cmp byte [hexprint_buffer_last_line_columns_to_display], 0x0
@@ -161,7 +177,8 @@ proc print_hex hexprint_buffer_total_lines_to_display, \
     ; to start specific to that row
     ; esi holds the original offset, edi is incremented for every cell display
     xor rcx, rcx
-    mov esi, edi
+    ;mov esi, edi
+    mov edi, esi
     ; save the position - end
 
     xor rcx, rcx
@@ -175,7 +192,6 @@ proc print_hex hexprint_buffer_total_lines_to_display, \
         xor r15d, r15d
         lea ebx, [hextable]
         lea r15d, [hexstring]
-        ;mov ecx, 16         ; 16 bytes at a time
         xor ecx, ecx
         mov cl, byte [hexprint_buffer_last_line_columns_to_display]
 
